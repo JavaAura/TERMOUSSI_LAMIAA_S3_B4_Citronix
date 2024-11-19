@@ -11,4 +11,5 @@ public interface FarmService {
     FarmDTO saveFarm(@Valid FarmDTO farmDTO);
     FarmDTO updateFarm(Long id, @Valid FarmDTO updatedFarmDTO);
     FarmDTO getFarmById(Long id);
+    void deleteFarm(Long id);
 }

@@ -50,4 +50,10 @@ public class FarmServiceImpl implements FarmService {
                 .orElseThrow(() -> new FarmNotFoundException(id));
         return farmMapper.toDTO(farm);
     }
+    @Override
+    public void deleteFarm(Long id) {
+        Farm farm = farmRepository.findById(id)
+                .orElseThrow(() -> new FarmNotFoundException(id));
+        farmRepository.delete(farm);
+    }
 }
