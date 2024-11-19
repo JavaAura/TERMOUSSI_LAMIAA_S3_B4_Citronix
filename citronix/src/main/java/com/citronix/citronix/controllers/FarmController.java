@@ -1,24 +1,25 @@
 package com.citronix.citronix.controllers;
 
 import com.citronix.citronix.dto.FarmDTO;
-import com.citronix.citronix.services.FarmService;
+import com.citronix.citronix.services.impl.FarmServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+
+import javax.validation.Valid;
 
 
 @RestController
 @RequestMapping("/farms")
 public class FarmController {
-    private final FarmService farmService;
+    private final FarmServiceImpl farmServiceImpl;
 
     @Autowired
-    public FarmController(FarmService farmService) {
-        this.farmService = farmService;
+    public FarmController(FarmServiceImpl farmServiceImpl) {
+        this.farmServiceImpl = farmServiceImpl;
     }
 
 //    @GetMapping
@@ -27,7 +28,12 @@ public class FarmController {
 //    }
     @GetMapping
     public ResponseEntity<Page<FarmDTO>> getAllFarms(Pageable pageable) {
-        Page<FarmDTO> farmPage = farmService.getAllFarms(pageable);
+        Page<FarmDTO> farmPage = farmServiceImpl.getAllFarms(pageable);
         return ResponseEntity.ok(farmPage);
+    }
+    @PostMapping
+    public ResponseEntity<FarmDTO> saveFarm(@RequestBody @Valid FarmDTO farmDTO) {
+        FarmDTO savedFarm = farmServiceImpl.saveFarm(farmDTO);
+        return new ResponseEntity<>(savedFarm, HttpStatus.CREATED);
     }
 }
