@@ -41,4 +41,9 @@ public class FarmController {
         FarmDTO updatedFarm = farmServiceImpl.updateFarm(id, updatedFarmDTO);
         return ResponseEntity.ok(updatedFarm);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<FarmDTO> getFarmById(@PathVariable Long id) {
+        FarmDTO farmDTO = farmServiceImpl.getFarmById(id);
+        return ResponseEntity.ok(farmDTO);
+    }
 }

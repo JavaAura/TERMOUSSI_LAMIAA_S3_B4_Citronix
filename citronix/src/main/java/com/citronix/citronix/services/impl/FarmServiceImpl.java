@@ -44,4 +44,10 @@ public class FarmServiceImpl implements FarmService {
         Farm updatedFarm = farmRepository.save(existingFarm);
         return farmMapper.toDTO(updatedFarm);
     }
+    @Override
+    public FarmDTO getFarmById(Long id) {
+        Farm farm = farmRepository.findById(id)
+                .orElseThrow(() -> new FarmNotFoundException(id));
+        return farmMapper.toDTO(farm);
+    }
 }
