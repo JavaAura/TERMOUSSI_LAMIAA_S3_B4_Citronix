@@ -6,13 +6,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = "spring")
+@Component
 public interface FarmMapper {
     FarmMapper INSTANCE = Mappers.getMapper(FarmMapper.class);
 
 //    @Mapping(target = "numberOfFields", expression = "java(farm.getFields() != null ? farm.getFields().size() : 0)")
-    FarmDTO toDto(Farm farm);
+    FarmDTO toDTO(Farm farm);
 
     Farm toEntity(FarmDTO farmDTO);
 
