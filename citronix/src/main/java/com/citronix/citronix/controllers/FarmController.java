@@ -36,4 +36,9 @@ public class FarmController {
         FarmDTO savedFarm = farmServiceImpl.saveFarm(farmDTO);
         return new ResponseEntity<>(savedFarm, HttpStatus.CREATED);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<FarmDTO> updateFarm(@PathVariable Long id, @RequestBody @Valid FarmDTO updatedFarmDTO) {
+        FarmDTO updatedFarm = farmServiceImpl.updateFarm(id, updatedFarmDTO);
+        return ResponseEntity.ok(updatedFarm);
+    }
 }

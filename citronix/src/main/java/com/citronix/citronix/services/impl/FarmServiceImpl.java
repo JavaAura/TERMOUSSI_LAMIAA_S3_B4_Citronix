@@ -2,6 +2,7 @@ package com.citronix.citronix.services.impl;
 
 import com.citronix.citronix.dto.FarmDTO;
 import com.citronix.citronix.entities.Farm;
+import com.citronix.citronix.exceptions.FarmNotFoundException;
 import com.citronix.citronix.mappers.FarmMapper;
 import com.citronix.citronix.repositories.FarmRepository;
 import com.citronix.citronix.services.inter.FarmService;
@@ -35,5 +36,12 @@ public class FarmServiceImpl implements FarmService {
         Farm savedFarm = farmRepository.save(farm);
         return farmMapper.toDTO(savedFarm);
     }
-
+    @Override
+    public FarmDTO updateFarm(Long id, @Valid FarmDTO updatedFarmDTO) {
+        Farm existingFarm = farmRepository.findById(id)
+                .orElseThrow(() -> new FarmNotFoundException(id));
+        farmMapper.updateEntityFromDTO(updatedFarmDTO, existingFarm);
+        Farm updatedFarm = farmRepository.save(existingFarm);
+        return farmMapper.toDTO(updatedFarm);
+    }
 }
