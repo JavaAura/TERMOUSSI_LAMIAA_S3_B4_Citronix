@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMin;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -25,4 +27,7 @@ public class Field {
     @ManyToOne
     @JoinColumn(name = "farm_id")
     private Farm farm;
+
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tree> trees = new ArrayList<>();
 }
