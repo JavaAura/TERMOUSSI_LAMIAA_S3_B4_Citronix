@@ -6,6 +6,7 @@ import com.citronix.citronix.exceptions.FarmNotFoundException;
 import com.citronix.citronix.mappers.FarmMapper;
 import com.citronix.citronix.repositories.FarmRepository;
 import com.citronix.citronix.services.inter.FarmService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.Valid;
 
 @Service
+@Slf4j
 public class FarmServiceImpl implements FarmService {
     private final FarmRepository farmRepository;
     private final FarmMapper farmMapper;

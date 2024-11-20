@@ -25,4 +25,10 @@ public class Tree {
     @ManyToOne
     @JoinColumn(name = "field_id", nullable = false)
     private Field field;
+
+    @Transient
+    private int age;
+
+    @Transient
+    private double productivityPerSeason;
 }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public interface TreeMapper {
 
-    @Mapping(source="fieldID",target="field.id")
+    @Mapping(source="fieldId",target="field.id")
     Tree toEntity(TreeDTO treeDTO);
 
     @Mapping(source="field.id",target="fieldId")
