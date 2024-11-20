@@ -60,7 +60,22 @@ public class FieldServiceImpl implements FieldService {
        Field field= fieldRepository.findById(id).orElseThrow(()->new FieldNotFoundException(id));
         return fieldMapper.toDTO(field);
     }
+    @Override
+    public FieldDTO updateField(Long id,@Valid FieldDTO updatedFieldDTO){
+        Field existingField=fieldRepository.findById(id).orElseThrow(()->new FieldNotFoundException(id));
+        Farm farm = existingField.getFarm();
+        double totalFieldsArea = fieldRepository.sumAreaByFarmId(farm.getId());
+        double remainingFarmArea = farm.getArea() - totalFieldsArea;
+        //to do: fields count not neccessary param null
+        long fieldsCount = fieldRepository.countByFarmId(farm.getId());
+        double updatedFieldArea = updatedFieldDTO.getArea();
 
+        validateFieldArea(updatedFieldArea, farm.getArea(), remainingFarmArea, fieldsCount);
+
+        fieldMapper.updateEntityFromDTO(updatedFieldDTO,existingField);
+        Field updatedField= fieldRepository.save(existingField);
+        return fieldMapper.toDTO(updatedField);
+    }
 
 
 
