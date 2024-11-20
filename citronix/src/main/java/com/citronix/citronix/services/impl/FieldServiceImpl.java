@@ -76,7 +76,11 @@ public class FieldServiceImpl implements FieldService {
         Field updatedField= fieldRepository.save(existingField);
         return fieldMapper.toDTO(updatedField);
     }
-
+    @Override
+    public void deleteField(Long id ){
+        Field existingField= fieldRepository.findById(id).orElseThrow(()->new FieldNotFoundException(id));
+        fieldRepository.delete(existingField);
+    }
 
 
     private void validateFieldArea(double fieldArea, double farmArea,double remainingFarmArea,long fieldsCount) {

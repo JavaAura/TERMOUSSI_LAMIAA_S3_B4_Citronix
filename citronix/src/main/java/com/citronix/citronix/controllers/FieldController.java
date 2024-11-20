@@ -46,4 +46,9 @@ public class FieldController {
        FieldDTO fieldDTO= fieldServiceImpl.updateField(id,updatedFieldDTO);
         return ResponseEntity.ok(fieldDTO);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteField (@PathVariable long id){
+        fieldServiceImpl.deleteField(id);
+        return ResponseEntity.noContent().build();
+    }
 }

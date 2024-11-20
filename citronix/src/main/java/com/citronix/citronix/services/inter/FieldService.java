@@ -12,4 +12,5 @@ public interface FieldService {
     Page<FieldDTO> getAllFields(Pageable pageable);
     FieldDTO getFieldById(Long id);
     FieldDTO updateField(Long id ,@Valid FieldDTO fieldDTO);
+    void deleteField(Long id);
 }
