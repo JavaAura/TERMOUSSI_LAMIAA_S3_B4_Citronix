@@ -9,6 +9,8 @@ import com.citronix.citronix.repositories.FieldRepository;
 import com.citronix.citronix.services.inter.FieldService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -44,6 +46,11 @@ public class FieldServiceImpl implements FieldService {
         Field savedField = fieldRepository.findById(field.getId()).orElseThrow(() -> new IllegalArgumentException("Field not found"));
         log.info("Farm associated with the saved field: {}", savedField.getFarm());
         return fieldMapper.toDTO(field);
+    }
+    @Override
+    public Page<FieldDTO> getAllFields(Pageable pageable){
+      Page<Field> fieldPage=  fieldRepository.findAll(pageable);
+      return fieldPage.map(fieldMapper::toDTO);
     }
 
 
