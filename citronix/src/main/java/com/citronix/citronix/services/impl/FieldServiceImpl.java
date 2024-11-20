@@ -3,6 +3,8 @@ package com.citronix.citronix.services.impl;
 import com.citronix.citronix.dto.FieldDTO;
 import com.citronix.citronix.entities.Farm;
 import com.citronix.citronix.entities.Field;
+import com.citronix.citronix.exceptions.FarmNotFoundException;
+import com.citronix.citronix.exceptions.FieldNotFoundException;
 import com.citronix.citronix.mappers.FieldMapper;
 import com.citronix.citronix.repositories.FarmRepository;
 import com.citronix.citronix.repositories.FieldRepository;
@@ -33,27 +35,31 @@ public class FieldServiceImpl implements FieldService {
     @Override
      public  FieldDTO saveField(@Valid FieldDTO fieldDTO){
         Farm farm = farmRepository.findById(fieldDTO.getFarmId())
-                .orElseThrow(() -> new IllegalArgumentException("Farm not found"));
+                .orElseThrow(() -> new FarmNotFoundException(fieldDTO.getFarmId()));
 
         double totalFieldsArea = fieldRepository.sumAreaByFarmId(farm.getId());
         double remainingFarmArea = farm.getArea() - totalFieldsArea;
         long fieldsCount = fieldRepository.countByFarmId(farm.getId());
+
         //checking field area<=50% farm area & total fields areas <=farm area & total fields od area <=10
         validateFieldArea(fieldDTO.getArea(), farm.getArea(),remainingFarmArea,fieldsCount);
         Field field = fieldMapper.toEntity(fieldDTO);
         field.setFarm(farm);
         fieldRepository.save(field);
-        Field savedField = fieldRepository.findById(field.getId()).orElseThrow(() -> new IllegalArgumentException("Field not found"));
-        log.info("Farm associated with the saved field: {}", savedField.getFarm());
+
         return fieldMapper.toDTO(field);
     }
+
     @Override
     public Page<FieldDTO> getAllFields(Pageable pageable){
       Page<Field> fieldPage=  fieldRepository.findAll(pageable);
       return fieldPage.map(fieldMapper::toDTO);
     }
-
-
+    @Override
+    public FieldDTO getFieldById(Long id){
+       Field field= fieldRepository.findById(id).orElseThrow(()->new FieldNotFoundException(id));
+        return fieldMapper.toDTO(field);
+    }
 
 
 
