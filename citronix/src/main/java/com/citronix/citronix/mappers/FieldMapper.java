@@ -7,8 +7,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-@Component
+    @Mapper(componentModel = "spring")
+    @Component
 public interface FieldMapper {
     @Mapping(source = "farm.id", target = "farmId")
     FieldDTO toDTO(Field field);
