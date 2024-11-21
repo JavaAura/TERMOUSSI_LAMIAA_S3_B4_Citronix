@@ -10,4 +10,5 @@ public interface HarvestDetailService {
     HarvestDetailDTO saveHarvestDetail(@Valid HarvestDetailDTO harvestDetailDTO);
     HarvestDetailDTO updateHarvestDetail(@Valid HarvestDetailDTO harvestDetailDTO,Long Id);
     Page<HarvestDetailDTO> getAllHarvestDetails(Pageable pageable);
+    void deleteHarvestDetail(Long id);
 }

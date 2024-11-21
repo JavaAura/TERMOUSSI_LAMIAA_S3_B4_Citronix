@@ -110,6 +110,13 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
         Page<HarvestDetail> harvestDetailsPage = harvestDetailRepository.findAll(pageable);
         return harvestDetailsPage.map(harvestDetailMapper::toDTO);
     }
+    @Override
+    public void deleteHarvestDetail(Long id){
+        HarvestDetail harvestDetail = harvestDetailRepository.findById(id)
+                .orElseThrow(() -> new HarvestDetailNotFoundException(id));
+        harvestDetailRepository.delete(harvestDetail);
+    }
+
 
 
     private void validateTreeNotAlreadyHarvested(Long treeId, Seasons season, int year) {

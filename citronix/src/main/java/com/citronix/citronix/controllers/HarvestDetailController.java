@@ -39,5 +39,9 @@ public class HarvestDetailController {
         Page<HarvestDetailDTO> harvestDetails = harvestDetailServiceImpl.getAllHarvestDetails(pageable);
         return ResponseEntity.ok(harvestDetails);
     }
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteHarvestDetail(@PathVariable Long id) {
+        harvestDetailServiceImpl.deleteHarvestDetail(id);
+        return ResponseEntity.noContent().build();
+    }
 }
