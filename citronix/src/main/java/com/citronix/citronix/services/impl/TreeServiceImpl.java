@@ -3,15 +3,18 @@ package com.citronix.citronix.services.impl;
 import com.citronix.citronix.dto.TreeDTO;
 import com.citronix.citronix.entities.Field;
 import com.citronix.citronix.entities.Tree;
+import com.citronix.citronix.exceptions.TreeNotFoundException;
 import com.citronix.citronix.mappers.TreeMapper;
 import com.citronix.citronix.repositories.FieldRepository;
 import com.citronix.citronix.repositories.TreeRepository;
 import com.citronix.citronix.services.inter.TreeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -52,6 +55,26 @@ public class TreeServiceImpl implements TreeService {
         Tree savedTree= treeRepository.save(tree);
         return treeMapper.toDTO(savedTree);
     }
+    @Override
+    public Page<TreeDTO> getAllTrees(Pageable pageable){
+        Page<Tree> treePage= treeRepository.findAll(pageable);
+        return treePage.map(treeMapper::toDTO);
+    }
+    @Override
+    public TreeDTO getTreeById(Long id){
+        Tree tree =treeRepository.findById(id).orElseThrow(()->new  TreeNotFoundException(id));
+        return treeMapper.toDTO(tree);
+    }
+
+
+
+
+
+
+
+
+
+
 
     private void checkTreeDensity(Field field, Tree tree) {
         int maxAllowedTrees = getMaxNumberOfTrees(convertHectaresToSquareMeters(field.getArea()));

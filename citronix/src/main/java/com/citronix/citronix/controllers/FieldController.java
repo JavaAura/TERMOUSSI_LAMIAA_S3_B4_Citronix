@@ -37,7 +37,7 @@ public class FieldController {
         return  ResponseEntity.ok(fieldsPage);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<FieldDTO> getFieldById(@PathVariable long id){
+    public ResponseEntity<FieldDTO> getFieldById(@PathVariable Long id){
         FieldDTO fieldDTO=fieldServiceImpl.getFieldById(id);
         return ResponseEntity.ok(fieldDTO);
     }
