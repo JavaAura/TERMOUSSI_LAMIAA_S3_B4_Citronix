@@ -13,7 +13,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 @Component
 public interface FarmMapper {
-//    @Mapping(target = "numberOfFields", expression = "java(farm.getFields() != null ? farm.getFields().size() : 0)")
     FarmDTO toDTO(Farm farm);
 
     Farm toEntity(FarmDTO farmDTO);
