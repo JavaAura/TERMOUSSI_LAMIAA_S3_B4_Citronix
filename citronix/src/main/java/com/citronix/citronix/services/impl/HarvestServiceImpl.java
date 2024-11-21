@@ -44,4 +44,11 @@ public class HarvestServiceImpl implements HarvestService {
         Harvest harvest=harvestRepository.findById(id).orElseThrow(()->new HarvestNotFoundException(id));
         return harvestMapper.toDTO(harvest);
     }
+    @Override
+    public HarvestDTO updateHarvest(Long id, @Valid HarvestDTO harvestDTO){
+        Harvest existingHarvest= harvestRepository.findById(id).orElseThrow(()->new HarvestNotFoundException(id));
+        harvestMapper.updateEntityFromDTO(harvestDTO,existingHarvest);
+        Harvest updatedHarvest=harvestRepository.save(existingHarvest);
+        return harvestMapper.toDTO(updatedHarvest);
+    }
 }

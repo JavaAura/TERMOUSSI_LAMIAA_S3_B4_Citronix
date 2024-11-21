@@ -38,4 +38,9 @@ public class HarvestController {
         HarvestDTO harvestDTO=harvestServiceImpl.getHarvestById(id);
         return ResponseEntity.ok(harvestDTO);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<HarvestDTO> updateHarvest(@PathVariable Long id,@RequestBody @Valid HarvestDTO updateHarvestDTO){
+        HarvestDTO harvestDTO=harvestServiceImpl.updateHarvest(id,updateHarvestDTO);
+        return ResponseEntity.ok(harvestDTO);
+    }
 }
