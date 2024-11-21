@@ -17,7 +17,7 @@ public class HarvestDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @Column(nullable = false)
     private double quantity;
 
     @ManyToOne

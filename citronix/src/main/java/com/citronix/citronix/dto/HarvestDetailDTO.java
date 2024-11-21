@@ -13,9 +13,10 @@ public class HarvestDetailDTO {
 
     private Long id;
 
-    private double quantity;
-
     private Long harvestId;
 
     private Long treeId;
+
+    private double quantity;
+
 }
