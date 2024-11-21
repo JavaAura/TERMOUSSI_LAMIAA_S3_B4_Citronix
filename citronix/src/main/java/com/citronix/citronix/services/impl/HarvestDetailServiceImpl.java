@@ -5,6 +5,7 @@ import com.citronix.citronix.entities.Harvest;
 import com.citronix.citronix.entities.HarvestDetail;
 import com.citronix.citronix.entities.Tree;
 import com.citronix.citronix.entities.enums.Seasons;
+import com.citronix.citronix.exceptions.HarvestDetailNotFoundException;
 import com.citronix.citronix.exceptions.HarvestNotFoundException;
 import com.citronix.citronix.exceptions.TreeNotFoundException;
 import com.citronix.citronix.mappers.HarvestDetailMapper;
@@ -67,6 +68,40 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
         log.info("Qte saved harvest" + savedHarvestDetail.getQuantity());
         return harvestDetailMapper.toDTO(savedHarvestDetail);
     }
+
+    @Override
+    public HarvestDetailDTO updateHarvestDetail(@Valid HarvestDetailDTO harvestDetailDTO,Long id) {
+        Long treeId = harvestDetailDTO.getTreeId();
+        Long harvestId = harvestDetailDTO.getHarvestId();
+
+        // Optionally, validate that the new treeId and harvestId are valid
+        Tree tree = treeRepository.findById(treeId)
+                .orElseThrow(() -> new TreeNotFoundException(treeId));
+
+        Harvest harvest = harvestRepository.findById(harvestId)
+                .orElseThrow(() -> new HarvestNotFoundException(harvestId));
+
+        // Fetch the existing HarvestDetail record
+        HarvestDetail existingHarvestDetail = harvestDetailRepository.findById(id)
+                .orElseThrow(() -> new HarvestDetailNotFoundException(id));
+
+        // Update the foreign keys  (changing associations)
+        existingHarvestDetail.setTree(tree);
+        existingHarvestDetail.setHarvest(harvest);
+
+        // Validate if the tree has already been harvested in the same season and year
+        Seasons harvestSeason = harvest.getSeason();
+        int harvestYear = harvest.getDate().getYear();
+        validateTreeNotAlreadyHarvested(treeId, harvestSeason, harvestYear);
+
+        int treeAge = treeServiceImpl.calculateAge(tree);
+        double newProductivity = treeServiceImpl.calculateProductivityPerSeason(treeAge);
+        existingHarvestDetail.setQuantity(newProductivity);  // Update quantity if needed
+
+        HarvestDetail updatedHarvestDetail = harvestDetailRepository.save(existingHarvestDetail);
+        return harvestDetailMapper.toDTO(updatedHarvestDetail);
+    }
+
 
     private void validateTreeNotAlreadyHarvested(Long treeId, Seasons season, int year) {
         boolean alreadyHarvested = harvestDetailRepository.existsByTreeIdAndHarvestSeasonAndHarvestYear(treeId, season, year);

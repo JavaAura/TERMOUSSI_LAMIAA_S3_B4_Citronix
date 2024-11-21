@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface HarvestDetailRepository extends JpaRepository<HarvestDetail,Long> {
     @Query("SELECT COUNT(hd) > 0 FROM HarvestDetail hd " +
             "WHERE hd.tree.id = :treeId AND hd.harvest.season = :season " +
@@ -14,4 +16,6 @@ public interface HarvestDetailRepository extends JpaRepository<HarvestDetail,Lon
             @Param("treeId") Long treeId,
             @Param("season") Seasons season,
             @Param("year") int year);
+
+    Optional<HarvestDetail> findByTreeIdAndHarvestId(Long treeId, Long harvestId);
 }
