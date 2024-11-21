@@ -10,4 +10,5 @@ public interface TreeService {
     TreeDTO saveTree(@Valid TreeDTO treeDTO);
     Page<TreeDTO> getAllTrees(Pageable pageable);
     TreeDTO getTreeById(Long id);
+    TreeDTO updateTree(Long id, @Valid TreeDTO updateTreeDTO);
 }

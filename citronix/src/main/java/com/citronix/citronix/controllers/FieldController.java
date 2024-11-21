@@ -42,12 +42,12 @@ public class FieldController {
         return ResponseEntity.ok(fieldDTO);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<FieldDTO> updateField(@PathVariable long id, @RequestBody @Valid FieldDTO updatedFieldDTO){
+    public ResponseEntity<FieldDTO> updateField(@PathVariable Long id, @RequestBody @Valid FieldDTO updatedFieldDTO){
        FieldDTO fieldDTO= fieldServiceImpl.updateField(id,updatedFieldDTO);
         return ResponseEntity.ok(fieldDTO);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteField (@PathVariable long id){
+    public ResponseEntity<Void> deleteField (@PathVariable Long id){
         fieldServiceImpl.deleteField(id);
         return ResponseEntity.noContent().build();
     }

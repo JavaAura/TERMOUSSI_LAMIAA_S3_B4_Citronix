@@ -36,4 +36,9 @@ public class TreeController {
         TreeDTO treeDTO=treeServiceImpl.getTreeById(id);
         return ResponseEntity.ok(treeDTO);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<TreeDTO> updateTree(@PathVariable Long id , @RequestBody @Valid TreeDTO updateTreeDTO){
+        TreeDTO treeDTO=treeServiceImpl.updateTree(id,updateTreeDTO);
+        return ResponseEntity.ok(treeDTO);
+    }
 }
