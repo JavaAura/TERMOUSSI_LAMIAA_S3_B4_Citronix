@@ -41,4 +41,9 @@ public class TreeController {
         TreeDTO treeDTO=treeServiceImpl.updateTree(id,updateTreeDTO);
         return ResponseEntity.ok(treeDTO);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTree(@PathVariable Long id){
+        treeServiceImpl.deleteTree(id);
+        return ResponseEntity.noContent().build();
+    }
 }

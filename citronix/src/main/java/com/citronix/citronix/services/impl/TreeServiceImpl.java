@@ -88,7 +88,11 @@ public class TreeServiceImpl implements TreeService {
         Tree savedTree = treeRepository.save(existingTree);
         return treeMapper.toDTO(savedTree);
     }
-
+    @Override
+    public void deleteTree(Long id){
+        Tree tree=treeRepository.findById(id).orElseThrow(()->new TreeNotFoundException(id));
+        treeRepository.delete(tree);
+    }
 
     private void checkTreeDensity(Field field, Tree tree) {
         int maxAllowedTrees = getMaxNumberOfTrees(convertHectaresToSquareMeters(field.getArea()));

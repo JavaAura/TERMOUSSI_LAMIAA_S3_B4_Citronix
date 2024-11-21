@@ -11,4 +11,5 @@ public interface TreeService {
     Page<TreeDTO> getAllTrees(Pageable pageable);
     TreeDTO getTreeById(Long id);
     TreeDTO updateTree(Long id, @Valid TreeDTO updateTreeDTO);
+    void deleteTree(Long id);
 }
