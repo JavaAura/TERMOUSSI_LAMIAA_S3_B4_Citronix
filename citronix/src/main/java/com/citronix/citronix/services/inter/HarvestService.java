@@ -9,4 +9,5 @@ import javax.validation.Valid;
 public interface HarvestService {
     HarvestDTO saveHarvest(@Valid HarvestDTO harvestDTO);
     Page<HarvestDTO> getAllHarvests(Pageable pageable);
+    HarvestDTO getHarvestById(Long id);
 }

@@ -33,4 +33,9 @@ public class HarvestController {
         Page<HarvestDTO> harvests=harvestServiceImpl.getAllHarvests(pageable);
         return ResponseEntity.ok(harvests);
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<HarvestDTO> gatHarvestById(@PathVariable Long id){
+        HarvestDTO harvestDTO=harvestServiceImpl.getHarvestById(id);
+        return ResponseEntity.ok(harvestDTO);
+    }
 }
