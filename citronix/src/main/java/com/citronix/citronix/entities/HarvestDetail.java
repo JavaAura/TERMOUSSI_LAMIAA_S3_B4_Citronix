@@ -7,33 +7,26 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Tree {
+public class HarvestDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    private LocalDate plantingDate;
+    private double quantity;
 
     @ManyToOne
-    @JoinColumn(name = "field_id", nullable = false)
-    private Field field;
+    @JoinColumn(name = "harvest_id")
+    private Harvest harvest;
 
-    @Transient
-    private int age;
+    @ManyToOne
+    @JoinColumn(name = "tree_id")
+    private Tree tree;
 
-    @Transient
-    private double productivityPerSeason;
 
-    @OneToMany(mappedBy = "tree")
-    private Set<HarvestDetail> harvestDetails = new HashSet<>();
 }

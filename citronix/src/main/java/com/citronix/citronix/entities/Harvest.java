@@ -1,5 +1,6 @@
 package com.citronix.citronix.entities;
 
+import com.citronix.citronix.entities.enums.Seasons;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,24 +17,21 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Tree {
+public class Harvest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
-    private LocalDate plantingDate;
+    @Enumerated(EnumType.STRING)
+    private Seasons season;
 
-    @ManyToOne
-    @JoinColumn(name = "field_id", nullable = false)
-    private Field field;
+    @NotNull
+    private LocalDate date;
 
-    @Transient
-    private int age;
-
-    @Transient
-    private double productivityPerSeason;
-
-    @OneToMany(mappedBy = "tree")
+    @OneToMany(mappedBy = "harvest")
     private Set<HarvestDetail> harvestDetails = new HashSet<>();
+
+    //    private double totalQte;
 }
