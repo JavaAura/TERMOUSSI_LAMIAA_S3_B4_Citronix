@@ -17,5 +17,5 @@ public interface HarvestDetailRepository extends JpaRepository<HarvestDetail,Lon
             @Param("season") Seasons season,
             @Param("year") int year);
 
-    Optional<HarvestDetail> findByTreeIdAndHarvestId(Long treeId, Long harvestId);
+
 }

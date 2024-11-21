@@ -15,9 +15,12 @@ import com.citronix.citronix.repositories.TreeRepository;
 import com.citronix.citronix.services.inter.HarvestDetailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+
 
 @Service
 @Slf4j
@@ -27,16 +30,16 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
     public final TreeRepository treeRepository;
     public final HarvestDetailRepository harvestDetailRepository;
     public final TreeServiceImpl treeServiceImpl;
-    public  final HarvestRepository harvestRepository;
+    public final HarvestRepository harvestRepository;
 
     @Autowired
     public HarvestDetailServiceImpl(HarvestDetailMapper harvestDetailMapper, HarvestDetailRepository harvestDetailRepository,
-                                    TreeRepository treeRepository, TreeServiceImpl treeServiceImpl,HarvestRepository harvestRepository) {
+                                    TreeRepository treeRepository, TreeServiceImpl treeServiceImpl, HarvestRepository harvestRepository) {
         this.harvestDetailMapper = harvestDetailMapper;
         this.harvestDetailRepository = harvestDetailRepository;
         this.treeRepository = treeRepository;
         this.treeServiceImpl = treeServiceImpl;
-        this.harvestRepository=harvestRepository;
+        this.harvestRepository = harvestRepository;
 
     }
 
@@ -70,7 +73,7 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
     }
 
     @Override
-    public HarvestDetailDTO updateHarvestDetail(@Valid HarvestDetailDTO harvestDetailDTO,Long id) {
+    public HarvestDetailDTO updateHarvestDetail(@Valid HarvestDetailDTO harvestDetailDTO, Long id) {
         Long treeId = harvestDetailDTO.getTreeId();
         Long harvestId = harvestDetailDTO.getHarvestId();
 
@@ -100,6 +103,12 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
 
         HarvestDetail updatedHarvestDetail = harvestDetailRepository.save(existingHarvestDetail);
         return harvestDetailMapper.toDTO(updatedHarvestDetail);
+    }
+
+    @Override
+    public Page<HarvestDetailDTO> getAllHarvestDetails(Pageable pageable){
+        Page<HarvestDetail> harvestDetailsPage = harvestDetailRepository.findAll(pageable);
+        return harvestDetailsPage.map(harvestDetailMapper::toDTO);
     }
 
 

@@ -4,6 +4,8 @@ import com.citronix.citronix.dto.HarvestDetailDTO;
 import com.citronix.citronix.services.impl.HarvestDetailServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,4 +34,10 @@ public class HarvestDetailController {
         HarvestDetailDTO updatedHarvestDetail = harvestDetailServiceImpl.updateHarvestDetail(harvestDetailDTO,id);
         return ResponseEntity.ok(updatedHarvestDetail);
     }
+    @GetMapping
+    public ResponseEntity<Page<HarvestDetailDTO>> getAllHarvestDetails(Pageable pageable) {
+        Page<HarvestDetailDTO> harvestDetails = harvestDetailServiceImpl.getAllHarvestDetails(pageable);
+        return ResponseEntity.ok(harvestDetails);
+    }
+
 }
