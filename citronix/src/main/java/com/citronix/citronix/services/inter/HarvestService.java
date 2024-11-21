@@ -11,4 +11,5 @@ public interface HarvestService {
     Page<HarvestDTO> getAllHarvests(Pageable pageable);
     HarvestDTO getHarvestById(Long id);
     HarvestDTO updateHarvest(Long id, @Valid HarvestDTO harvestDTO);
+    void deleteHarvest(Long id);
 }

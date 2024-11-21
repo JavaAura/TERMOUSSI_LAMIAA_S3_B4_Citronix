@@ -43,4 +43,9 @@ public class HarvestController {
         HarvestDTO harvestDTO=harvestServiceImpl.updateHarvest(id,updateHarvestDTO);
         return ResponseEntity.ok(harvestDTO);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteHarvest(@PathVariable  Long id){
+        harvestServiceImpl.deleteHarvest(id);
+        return ResponseEntity.noContent().build();
+    }
 }

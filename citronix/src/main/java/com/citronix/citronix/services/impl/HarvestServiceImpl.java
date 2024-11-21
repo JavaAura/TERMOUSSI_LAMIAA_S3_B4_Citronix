@@ -51,4 +51,9 @@ public class HarvestServiceImpl implements HarvestService {
         Harvest updatedHarvest=harvestRepository.save(existingHarvest);
         return harvestMapper.toDTO(updatedHarvest);
     }
+    @Override
+    public void deleteHarvest(Long id){
+        Harvest harvest=harvestRepository.findById(id).orElseThrow(()->new HarvestNotFoundException(id));
+        harvestRepository.delete(harvest);
+    }
 }
