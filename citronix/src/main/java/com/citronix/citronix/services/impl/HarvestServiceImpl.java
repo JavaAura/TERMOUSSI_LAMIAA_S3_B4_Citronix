@@ -8,7 +8,10 @@ import com.citronix.citronix.repositories.HarvestRepository;
 import com.citronix.citronix.services.inter.HarvestDetailService;
 import com.citronix.citronix.services.inter.HarvestService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
@@ -29,5 +32,10 @@ public class HarvestServiceImpl implements HarvestService {
         Harvest harvest=harvestMapper.toEntity(harvestDTO);
       Harvest savedHarvest=  harvestRepository.save(harvest);
       return harvestMapper.toDTO(savedHarvest);
+    }
+    @Override
+    public Page<HarvestDTO> getAllHarvests(Pageable pageable){
+        Page<Harvest> harvests= harvestRepository.findAll(pageable);
+        return harvests.map(harvestMapper::toDTO);
     }
 }

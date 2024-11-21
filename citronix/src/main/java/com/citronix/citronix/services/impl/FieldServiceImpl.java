@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
 
-@Service
-@Slf4j
+    @Service
+    @Slf4j
 public class FieldServiceImpl implements FieldService {
     private final FieldMapper fieldMapper;
     private final FarmRepository farmRepository;
