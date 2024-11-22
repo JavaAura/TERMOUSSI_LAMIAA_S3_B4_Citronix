@@ -74,18 +74,6 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
 
         return harvestDetailMapper.toDTO(savedHarvestDetail);
     }
-
-    private void CalculHarvestTotalQte(Harvest harvest) {
-        List<HarvestDetail> harvestDetails = harvestDetailRepository.findByHarvest(harvest);
-
-        double totalQuantity = 0;
-        for (HarvestDetail detail : harvestDetails) {
-            totalQuantity += detail.getQuantity();
-        }
-        harvest.setTotalQte(totalQuantity);
-        harvestRepository.save(harvest);
-    }
-
     @Override
     public HarvestDetailDTO updateHarvestDetail(@Valid HarvestDetailDTO harvestDetailDTO, Long id) {
         Long treeId = harvestDetailDTO.getTreeId();
@@ -134,8 +122,16 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
         harvestDetailRepository.delete(harvestDetail);
         CalculHarvestTotalQte(harvest);
     }
+    private void CalculHarvestTotalQte(Harvest harvest) {
+        List<HarvestDetail> harvestDetails = harvestDetailRepository.findByHarvest(harvest);
 
-
+        double totalQuantity = 0;
+        for (HarvestDetail detail : harvestDetails) {
+            totalQuantity += detail.getQuantity();
+        }
+        harvest.setTotalQte(totalQuantity);
+        harvestRepository.save(harvest);
+    }
     private void validateTreeNotAlreadyHarvested(Long treeId, Seasons season, int year) {
         boolean alreadyHarvested = harvestDetailRepository.existsByTreeIdAndHarvestSeasonAndHarvestYear(treeId, season, year);
         if (alreadyHarvested) {
