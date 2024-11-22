@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -57,5 +59,10 @@ public class FarmServiceImpl implements FarmService {
         Farm farm = farmRepository.findById(id)
                 .orElseThrow(() -> new FarmNotFoundException(id));
         farmRepository.delete(farm);
+    }
+    @Override
+    public List<FarmDTO> searchFarms(String name, String location, Double area) {
+        List<Farm> farms=farmRepository.findFarmsByCriteria(name, location, area);
+        return farms.stream().map(farmMapper::toDTO).collect(Collectors.toList());
     }
 }
