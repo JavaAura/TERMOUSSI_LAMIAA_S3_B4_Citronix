@@ -38,8 +38,7 @@ public class Harvest {
     @Column(nullable = false)
     private double totalQte;
 
-    @OneToMany(mappedBy = "harvest", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Sale> sales;
-
+    @OneToOne(mappedBy = "harvest")
+    private Sale sale;
 
 }

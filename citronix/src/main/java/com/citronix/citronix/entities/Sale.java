@@ -28,8 +28,8 @@ public class Sale {
     @NotNull(message = "client name cannot be null")
     private String clientName;
 
-    @ManyToOne
-    @JoinColumn(name = "harvest_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "harvest_id", nullable = false, unique = true)
     private Harvest harvest;
 
     @Column(nullable = false)
