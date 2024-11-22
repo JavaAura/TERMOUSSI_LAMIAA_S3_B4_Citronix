@@ -1,9 +1,9 @@
 package com.citronix.citronix.repositories;
 
-import com.citronix.citronix.entities.Farm;
+import com.citronix.citronix.entities.Sale;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FarmRepository extends JpaRepository<Farm, Long> {
+public interface SaleRepository extends JpaRepository<Sale,Long> {
 }
