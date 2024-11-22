@@ -14,6 +14,7 @@ import com.citronix.citronix.repositories.HarvestRepository;
 import com.citronix.citronix.repositories.TreeRepository;
 import com.citronix.citronix.services.inter.HarvestDetailService;
 import com.citronix.citronix.services.validation.HarvestDetailValidationService;
+import com.citronix.citronix.services.validation.TreeValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,17 +35,19 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
     private final TreeServiceImpl treeServiceImpl;
     private final HarvestRepository harvestRepository;
     private final HarvestDetailValidationService harvestDetailValidationService;
+    private final TreeValidationService treeValidationService;
 
     @Autowired
     public HarvestDetailServiceImpl(HarvestDetailMapper harvestDetailMapper, HarvestDetailRepository harvestDetailRepository,
                                     TreeRepository treeRepository, TreeServiceImpl treeServiceImpl, HarvestRepository harvestRepository,
-                                    HarvestDetailValidationService harvestDetailValidationService) {
+                                    HarvestDetailValidationService harvestDetailValidationService,TreeValidationService treeValidationService) {
         this.harvestDetailMapper = harvestDetailMapper;
         this.harvestDetailRepository = harvestDetailRepository;
         this.treeRepository = treeRepository;
         this.treeServiceImpl = treeServiceImpl;
         this.harvestRepository = harvestRepository;
         this.harvestDetailValidationService = harvestDetailValidationService;
+        this.treeValidationService=treeValidationService;
     }
 
     @Override
@@ -62,8 +65,8 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
                 .orElseThrow(() -> new TreeNotFoundException(harvestDetailDTO.getTreeId()));
 
         //set quantity (tree productivity)
-        double harvestTreeProd = treeServiceImpl
-                .calculateProductivityPerSeason(treeServiceImpl.calculateAge(harvestTree));
+        double harvestTreeProd = treeValidationService
+                .calculateProductivityPerSeason(treeValidationService.calculateAge(harvestTree));
         harvestDetail.setQuantity(harvestTreeProd);
 
         //validate  harvest per season
@@ -97,7 +100,7 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
         harvestDetailValidationService.validateTreeNotAlreadyHarvested(harvestDetailDTO.getTreeId(), harvest.getSeason(),
                 harvest.getDate().getYear());
 
-        double newProductivity = treeServiceImpl.calculateProductivityPerSeason(treeServiceImpl.calculateAge(tree));
+        double newProductivity = treeValidationService.calculateProductivityPerSeason(treeValidationService.calculateAge(tree));
         existingHarvestDetail.setQuantity(newProductivity);
 
         HarvestDetail updatedHarvestDetail = harvestDetailRepository.save(existingHarvestDetail);
