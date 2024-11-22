@@ -76,6 +76,13 @@ public class SaleServiceImpl implements SaleService {
         saleRepository.delete(sale);
     }
 
+    @Override
+    public SaleDTO getSaleById(Long saleId) {
+        Sale sale = saleRepository.findById(saleId)
+                .orElseThrow(() -> new SaleNotFoundException(saleId));
+        return saleMapper.toDTO(sale);
+    }
+
     private void validateSaleDate(Sale sale, Harvest harvest) {
         if (harvest.getDate().isAfter(sale.getSaleDate())) {
             throw new IllegalArgumentException("Sale date should be after harvest date");

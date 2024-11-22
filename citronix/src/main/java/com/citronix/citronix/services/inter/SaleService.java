@@ -11,5 +11,6 @@ public interface SaleService {
     Page<SaleDTO> getAllSales(Pageable pageable);
     SaleDTO updateSale(Long id, @Valid SaleDTO saleDTO);
     void deleteSale(Long saleId);
+    SaleDTO getSaleById(Long saleId);
 
 }
