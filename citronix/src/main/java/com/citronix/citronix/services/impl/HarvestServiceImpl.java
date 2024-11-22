@@ -20,8 +20,8 @@ import javax.validation.Valid;
 @Service
 @Slf4j
 public class HarvestServiceImpl implements HarvestService {
-    public final HarvestMapper harvestMapper;
-    public final HarvestRepository harvestRepository;
+    private final HarvestMapper harvestMapper;
+    private final HarvestRepository harvestRepository;
 
     @Autowired
     public HarvestServiceImpl( HarvestMapper harvestMapper,HarvestRepository harvestRepository){

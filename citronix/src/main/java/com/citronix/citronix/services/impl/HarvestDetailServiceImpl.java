@@ -13,6 +13,7 @@ import com.citronix.citronix.repositories.HarvestDetailRepository;
 import com.citronix.citronix.repositories.HarvestRepository;
 import com.citronix.citronix.repositories.TreeRepository;
 import com.citronix.citronix.services.inter.HarvestDetailService;
+import com.citronix.citronix.services.validation.HarvestDetailValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,21 +28,23 @@ import java.util.List;
 @Slf4j
 public class HarvestDetailServiceImpl implements HarvestDetailService {
 
-    public final HarvestDetailMapper harvestDetailMapper;
-    public final TreeRepository treeRepository;
-    public final HarvestDetailRepository harvestDetailRepository;
-    public final TreeServiceImpl treeServiceImpl;
-    public final HarvestRepository harvestRepository;
+    private final HarvestDetailMapper harvestDetailMapper;
+    private final TreeRepository treeRepository;
+    private final HarvestDetailRepository harvestDetailRepository;
+    private final TreeServiceImpl treeServiceImpl;
+    private final HarvestRepository harvestRepository;
+    private final HarvestDetailValidationService harvestDetailValidationService;
 
     @Autowired
     public HarvestDetailServiceImpl(HarvestDetailMapper harvestDetailMapper, HarvestDetailRepository harvestDetailRepository,
-                                    TreeRepository treeRepository, TreeServiceImpl treeServiceImpl, HarvestRepository harvestRepository) {
+                                    TreeRepository treeRepository, TreeServiceImpl treeServiceImpl, HarvestRepository harvestRepository,
+                                    HarvestDetailValidationService harvestDetailValidationService) {
         this.harvestDetailMapper = harvestDetailMapper;
         this.harvestDetailRepository = harvestDetailRepository;
         this.treeRepository = treeRepository;
         this.treeServiceImpl = treeServiceImpl;
         this.harvestRepository = harvestRepository;
-
+        this.harvestDetailValidationService = harvestDetailValidationService;
     }
 
     @Override
@@ -50,61 +53,55 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
         log.info("HarvestDetail: {}", harvestDetail);
 
         // Fetch Harvest with its properties
-        Long harvestId = harvestDetailDTO.getHarvestId();
-        Harvest harvest = harvestRepository.findById(harvestId)
-                .orElseThrow(() -> new HarvestNotFoundException(harvestId));
+        Harvest harvest = harvestRepository.findById(harvestDetailDTO.getHarvestId())
+                .orElseThrow(() -> new HarvestNotFoundException(harvestDetailDTO.getHarvestId()));
         harvestDetail.setHarvest(harvest);
 
         //validate existing tree
-        Long harvestTreeId = harvestDetailDTO.getTreeId();
-        Tree harvestTree = treeRepository.findById(harvestTreeId).orElseThrow(() -> new TreeNotFoundException(harvestTreeId));
-        //calcul tree age
-        int harvestTreeAge = treeServiceImpl.calculateAge(harvestTree);
+        Tree harvestTree = treeRepository.findById(harvestDetailDTO.getTreeId())
+                .orElseThrow(() -> new TreeNotFoundException(harvestDetailDTO.getTreeId()));
+
         //set quantity (tree productivity)
-        double harvestTreeProd = treeServiceImpl.calculateProductivityPerSeason(harvestTreeAge);
+        double harvestTreeProd = treeServiceImpl
+                .calculateProductivityPerSeason(treeServiceImpl.calculateAge(harvestTree));
         harvestDetail.setQuantity(harvestTreeProd);
+
         //validate  harvest per season
-        Seasons harvestSeason = harvest.getSeason();
-        int harvestYear = harvest.getDate().getYear();
-        validateTreeNotAlreadyHarvested(harvestTreeId, harvestSeason, harvestYear);
+        harvestDetailValidationService.validateTreeNotAlreadyHarvested(harvestDetailDTO.getTreeId(), harvest.getSeason(),
+                harvest.getDate().getYear());
 
         HarvestDetail savedHarvestDetail = harvestDetailRepository.save(harvestDetail);
         // Recalculate totalQte for the associated Harvest
-        CalculHarvestTotalQte(savedHarvestDetail.getHarvest());
+        SetCalculHarvestTotalQte(savedHarvestDetail.getHarvest());
 
         return harvestDetailMapper.toDTO(savedHarvestDetail);
     }
+
     @Override
     public HarvestDetailDTO updateHarvestDetail(@Valid HarvestDetailDTO harvestDetailDTO, Long id) {
-        Long treeId = harvestDetailDTO.getTreeId();
-        Long harvestId = harvestDetailDTO.getHarvestId();
+        Tree tree = treeRepository.findById(harvestDetailDTO.getTreeId())
+                .orElseThrow(() -> new TreeNotFoundException(harvestDetailDTO.getTreeId()));
 
-        // Optionally, validate that the new treeId and harvestId are valid
-        Tree tree = treeRepository.findById(treeId)
-                .orElseThrow(() -> new TreeNotFoundException(treeId));
-
-        Harvest harvest = harvestRepository.findById(harvestId)
-                .orElseThrow(() -> new HarvestNotFoundException(harvestId));
+        Harvest harvest = harvestRepository.findById(harvestDetailDTO.getHarvestId())
+                .orElseThrow(() -> new HarvestNotFoundException(harvestDetailDTO.getHarvestId()));
 
         // Fetch the existing HarvestDetail record
         HarvestDetail existingHarvestDetail = harvestDetailRepository.findById(id)
                 .orElseThrow(() -> new HarvestDetailNotFoundException(id));
 
-        // Update the foreign keys  (changing associations)
+        // Update the foreign keys
         existingHarvestDetail.setTree(tree);
         existingHarvestDetail.setHarvest(harvest);
 
         // Validate if the tree has already been harvested in the same season and year
-        Seasons harvestSeason = harvest.getSeason();
-        int harvestYear = harvest.getDate().getYear();
-        validateTreeNotAlreadyHarvested(treeId, harvestSeason, harvestYear);
+        harvestDetailValidationService.validateTreeNotAlreadyHarvested(harvestDetailDTO.getTreeId(), harvest.getSeason(),
+                harvest.getDate().getYear());
 
-        int treeAge = treeServiceImpl.calculateAge(tree);
-        double newProductivity = treeServiceImpl.calculateProductivityPerSeason(treeAge);
-        existingHarvestDetail.setQuantity(newProductivity);  // Update quantity if needed
+        double newProductivity = treeServiceImpl.calculateProductivityPerSeason(treeServiceImpl.calculateAge(tree));
+        existingHarvestDetail.setQuantity(newProductivity);
 
         HarvestDetail updatedHarvestDetail = harvestDetailRepository.save(existingHarvestDetail);
-        CalculHarvestTotalQte(harvest);
+        SetCalculHarvestTotalQte(harvest);
         return harvestDetailMapper.toDTO(updatedHarvestDetail);
     }
 
@@ -120,9 +117,10 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
                 .orElseThrow(() -> new HarvestDetailNotFoundException(id));
         Harvest harvest = harvestDetail.getHarvest();
         harvestDetailRepository.delete(harvestDetail);
-        CalculHarvestTotalQte(harvest);
+        SetCalculHarvestTotalQte(harvest);
     }
-    private void CalculHarvestTotalQte(Harvest harvest) {
+
+    private void SetCalculHarvestTotalQte(Harvest harvest) {
         List<HarvestDetail> harvestDetails = harvestDetailRepository.findByHarvest(harvest);
 
         double totalQuantity = 0;
@@ -131,13 +129,6 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
         }
         harvest.setTotalQte(totalQuantity);
         harvestRepository.save(harvest);
-    }
-    private void validateTreeNotAlreadyHarvested(Long treeId, Seasons season, int year) {
-        boolean alreadyHarvested = harvestDetailRepository.existsByTreeIdAndHarvestSeasonAndHarvestYear(treeId, season, year);
-        if (alreadyHarvested) {
-            throw new IllegalArgumentException(
-                    "The tree with ID " + treeId + " has already been harvested in the " + season + " of " + year);
-        }
     }
 
 
