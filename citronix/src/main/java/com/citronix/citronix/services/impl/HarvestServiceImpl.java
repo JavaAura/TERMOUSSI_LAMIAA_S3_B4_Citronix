@@ -24,37 +24,41 @@ public class HarvestServiceImpl implements HarvestService {
     private final HarvestRepository harvestRepository;
 
     @Autowired
-    public HarvestServiceImpl( HarvestMapper harvestMapper,HarvestRepository harvestRepository){
-        this.harvestMapper=harvestMapper;
-        this.harvestRepository=harvestRepository;
+    public HarvestServiceImpl(HarvestMapper harvestMapper, HarvestRepository harvestRepository) {
+        this.harvestMapper = harvestMapper;
+        this.harvestRepository = harvestRepository;
     }
+
     @Override
-    public HarvestDTO saveHarvest(@Valid HarvestDTO harvestDTO){
-        Harvest harvest=harvestMapper.toEntity(harvestDTO);
-//        harvest.calculateTotalQuantity();
-      Harvest savedHarvest=  harvestRepository.save(harvest);
-      return harvestMapper.toDTO(savedHarvest);
+    public HarvestDTO saveHarvest(@Valid HarvestDTO harvestDTO) {
+        Harvest harvest = harvestMapper.toEntity(harvestDTO);
+        Harvest savedHarvest = harvestRepository.save(harvest);
+        return harvestMapper.toDTO(savedHarvest);
     }
+
     @Override
-    public Page<HarvestDTO> getAllHarvests(Pageable pageable){
-        Page<Harvest> harvests= harvestRepository.findAll(pageable);
+    public Page<HarvestDTO> getAllHarvests(Pageable pageable) {
+        Page<Harvest> harvests = harvestRepository.findAll(pageable);
         return harvests.map(harvestMapper::toDTO);
     }
+
     @Override
-    public HarvestDTO getHarvestById(Long id){
-        Harvest harvest=harvestRepository.findById(id).orElseThrow(()->new HarvestNotFoundException(id));
+    public HarvestDTO getHarvestById(Long id) {
+        Harvest harvest = harvestRepository.findById(id).orElseThrow(() -> new HarvestNotFoundException(id));
         return harvestMapper.toDTO(harvest);
     }
+
     @Override
-    public HarvestDTO updateHarvest(Long id, @Valid HarvestDTO harvestDTO){
-        Harvest existingHarvest= harvestRepository.findById(id).orElseThrow(()->new HarvestNotFoundException(id));
-        harvestMapper.updateEntityFromDTO(harvestDTO,existingHarvest);
-        Harvest updatedHarvest=harvestRepository.save(existingHarvest);
+    public HarvestDTO updateHarvest(Long id, @Valid HarvestDTO harvestDTO) {
+        Harvest existingHarvest = harvestRepository.findById(id).orElseThrow(() -> new HarvestNotFoundException(id));
+        harvestMapper.updateEntityFromDTO(harvestDTO, existingHarvest);
+        Harvest updatedHarvest = harvestRepository.save(existingHarvest);
         return harvestMapper.toDTO(updatedHarvest);
     }
+
     @Override
-    public void deleteHarvest(Long id){
-        Harvest harvest=harvestRepository.findById(id).orElseThrow(()->new HarvestNotFoundException(id));
+    public void deleteHarvest(Long id) {
+        Harvest harvest = harvestRepository.findById(id).orElseThrow(() -> new HarvestNotFoundException(id));
         harvestRepository.delete(harvest);
     }
 }

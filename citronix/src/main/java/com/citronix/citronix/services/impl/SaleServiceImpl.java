@@ -9,6 +9,7 @@ import com.citronix.citronix.mappers.SaleMapper;
 import com.citronix.citronix.repositories.HarvestRepository;
 import com.citronix.citronix.repositories.SaleRepository;
 import com.citronix.citronix.services.inter.SaleService;
+import com.citronix.citronix.services.validation.SaleValidationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,12 +24,15 @@ public class SaleServiceImpl implements SaleService {
     private final SaleMapper saleMapper;
     private final SaleRepository saleRepository;
     private final HarvestRepository harvestRepository;
+    private  final SaleValidationService saleValidationService;
 
     @Autowired
-    public SaleServiceImpl(SaleMapper saleMapper, SaleRepository saleRepository, HarvestRepository harvestRepository) {
+    public SaleServiceImpl(SaleMapper saleMapper, SaleRepository saleRepository, HarvestRepository harvestRepository,
+                           SaleValidationService saleValidationService) {
         this.saleMapper = saleMapper;
         this.saleRepository = saleRepository;
         this.harvestRepository = harvestRepository;
+        this.saleValidationService=saleValidationService;
     }
 
     @Override
@@ -37,10 +41,10 @@ public class SaleServiceImpl implements SaleService {
                 .orElseThrow(() -> new HarvestNotFoundException(saleDTO.getHarvestId()));
         Sale sale = saleMapper.toEntity(saleDTO);
 
-        validateHarvestBeforeSale(harvest);
-        validateSaleDate(sale, harvest);
+        saleValidationService.validateHarvestBeforeSale(harvest);
+        saleValidationService.validateSaleDate(sale, harvest);
         sale.setQuantity(harvest.getTotalQte());
-        sale.setRevenue(CalculRevenue(harvest, sale));
+        sale.setRevenue(saleValidationService.CalculRevenue(harvest, sale));
 
         sale.setHarvest(harvest);
         Sale savedSale = saleRepository.save(sale);
@@ -60,11 +64,11 @@ public class SaleServiceImpl implements SaleService {
         Harvest harvest = harvestRepository.findById(saleDTO.getHarvestId())
                 .orElseThrow(() -> new HarvestNotFoundException(saleDTO.getHarvestId()));
         saleMapper.updateEntityFromDTO(saleDTO, existingSale);
-        validateSaleDate(existingSale, harvest);
+        saleValidationService.validateSaleDate(existingSale, harvest);
 
         existingSale.setQuantity(harvest.getTotalQte());
         // Recalculate the revenue
-        existingSale.setRevenue(CalculRevenue(harvest, existingSale));
+        existingSale.setRevenue(saleValidationService.CalculRevenue(harvest, existingSale));
         Sale updatedSale = saleRepository.save(existingSale);
         return saleMapper.toDTO(updatedSale);
     }
@@ -83,22 +87,5 @@ public class SaleServiceImpl implements SaleService {
         return saleMapper.toDTO(sale);
     }
 
-    private void validateSaleDate(Sale sale, Harvest harvest) {
-        if (harvest.getDate().isAfter(sale.getSaleDate())) {
-            throw new IllegalArgumentException("Sale date should be after harvest date");
-        }
-    }
 
-    private double CalculRevenue(Harvest harvest, Sale sale) {
-        return harvest.getTotalQte() * sale.getUnitPrice();
-    }
-
-    private void validateHarvestBeforeSale(Harvest harvest) {
-        if (harvest.getSale() != null) {
-            throw new IllegalStateException("This harvest has already been sold.");
-        }
-        if (harvest.getTotalQte() == 0) {
-            throw new IllegalStateException("This harvest has not been completed yet and cannot be sold.");
-        }
-    }
 }
