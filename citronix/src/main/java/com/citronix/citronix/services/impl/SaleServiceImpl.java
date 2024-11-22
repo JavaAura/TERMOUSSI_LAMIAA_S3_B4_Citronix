@@ -40,7 +40,7 @@ public class SaleServiceImpl implements SaleService {
         validateHarvestBeforeSale(harvest);
         validateSaleDate(sale, harvest);
         sale.setQuantity(harvest.getTotalQte());
-        sale.setRevenue( CalculRevenue(harvest,sale));
+        sale.setRevenue(CalculRevenue(harvest, sale));
 
         sale.setHarvest(harvest);
         Sale savedSale = saleRepository.save(sale);
@@ -64,9 +64,16 @@ public class SaleServiceImpl implements SaleService {
 
         existingSale.setQuantity(harvest.getTotalQte());
         // Recalculate the revenue
-        existingSale.setRevenue(CalculRevenue(harvest,existingSale));
+        existingSale.setRevenue(CalculRevenue(harvest, existingSale));
         Sale updatedSale = saleRepository.save(existingSale);
         return saleMapper.toDTO(updatedSale);
+    }
+
+    @Override
+    public void deleteSale(Long saleId) {
+        Sale sale = saleRepository.findById(saleId)
+                .orElseThrow(() -> new SaleNotFoundException(saleId));
+        saleRepository.delete(sale);
     }
 
     private void validateSaleDate(Sale sale, Harvest harvest) {
