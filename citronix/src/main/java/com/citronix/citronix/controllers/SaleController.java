@@ -19,20 +19,27 @@ public class SaleController {
     private final SaleServiceImpl saleServiceImpl;
 
     @Autowired
-    public SaleController( SaleServiceImpl saleServiceImpl){
-        this.saleServiceImpl=saleServiceImpl;
+    public SaleController(SaleServiceImpl saleServiceImpl) {
+        this.saleServiceImpl = saleServiceImpl;
     }
 
     @PostMapping
-    public ResponseEntity<SaleDTO> saveSale(@RequestBody @Valid SaleDTO saleDTO){
-        SaleDTO savedSaleDTO= saleServiceImpl.saveSale(saleDTO);
+    public ResponseEntity<SaleDTO> saveSale(@RequestBody @Valid SaleDTO saleDTO) {
+        SaleDTO savedSaleDTO = saleServiceImpl.saveSale(saleDTO);
         return ResponseEntity.ok(savedSaleDTO);
     }
 
     @GetMapping
-    public ResponseEntity<Page<SaleDTO>> getAllSales(Pageable pageable){
-        Page<SaleDTO> sales=saleServiceImpl.getAllSales(pageable);
+    public ResponseEntity<Page<SaleDTO>> getAllSales(Pageable pageable) {
+        Page<SaleDTO> sales = saleServiceImpl.getAllSales(pageable);
         return ResponseEntity.ok(sales);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<SaleDTO> updateSale(@PathVariable Long id,
+                                              @Valid @RequestBody SaleDTO saleDTO) {
+        SaleDTO updatedSale = saleServiceImpl.updateSale(id, saleDTO);
+        return ResponseEntity.ok(updatedSale);
     }
 
 }

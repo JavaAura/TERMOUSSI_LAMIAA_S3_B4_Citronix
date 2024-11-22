@@ -4,6 +4,7 @@ import com.citronix.citronix.dto.SaleDTO;
 import com.citronix.citronix.entities.Harvest;
 import com.citronix.citronix.entities.Sale;
 import com.citronix.citronix.exceptions.HarvestNotFoundException;
+import com.citronix.citronix.exceptions.SaleNotFoundException;
 import com.citronix.citronix.mappers.SaleMapper;
 import com.citronix.citronix.repositories.HarvestRepository;
 import com.citronix.citronix.repositories.SaleRepository;
@@ -24,32 +25,60 @@ public class SaleServiceImpl implements SaleService {
     private final HarvestRepository harvestRepository;
 
     @Autowired
-    public SaleServiceImpl( SaleMapper saleMapper,SaleRepository saleRepository, HarvestRepository harvestRepository){
-        this.saleMapper=saleMapper;
-        this.saleRepository=saleRepository;
-        this.harvestRepository=harvestRepository;
+    public SaleServiceImpl(SaleMapper saleMapper, SaleRepository saleRepository, HarvestRepository harvestRepository) {
+        this.saleMapper = saleMapper;
+        this.saleRepository = saleRepository;
+        this.harvestRepository = harvestRepository;
     }
+
     @Override
-    public SaleDTO saveSale(@Valid SaleDTO saleDTO){
+    public SaleDTO saveSale(@Valid SaleDTO saleDTO) {
         Harvest harvest = harvestRepository.findById(saleDTO.getHarvestId())
                 .orElseThrow(() -> new HarvestNotFoundException(saleDTO.getHarvestId()));
-       validateHarvestBeforeSale(harvest);
-        Sale sale=saleMapper.toEntity(saleDTO);
-        double totalQuantity = harvest.getTotalQte();
-        sale.setQuantity(totalQuantity);
+        Sale sale = saleMapper.toEntity(saleDTO);
 
-        double revenue = totalQuantity * sale.getUnitPrice();
-        sale.setRevenue(revenue);
+        validateHarvestBeforeSale(harvest);
+        validateSaleDate(sale, harvest);
+        sale.setQuantity(harvest.getTotalQte());
+        sale.setRevenue( CalculRevenue(harvest,sale));
 
         sale.setHarvest(harvest);
-        Sale savedSale=saleRepository.save(sale);
+        Sale savedSale = saleRepository.save(sale);
         return saleMapper.toDTO(savedSale);
     }
+
     @Override
-    public Page<SaleDTO> getAllSales(Pageable pageable){
-        Page<Sale> salesPage=saleRepository.findAll(pageable);
+    public Page<SaleDTO> getAllSales(Pageable pageable) {
+        Page<Sale> salesPage = saleRepository.findAll(pageable);
         return salesPage.map(saleMapper::toDTO);
     }
+
+    @Override
+    public SaleDTO updateSale(Long id, @Valid SaleDTO saleDTO) {
+        Sale existingSale = saleRepository.findById(id)
+                .orElseThrow(() -> new SaleNotFoundException(id));
+        Harvest harvest = harvestRepository.findById(saleDTO.getHarvestId())
+                .orElseThrow(() -> new HarvestNotFoundException(saleDTO.getHarvestId()));
+        saleMapper.updateEntityFromDTO(saleDTO, existingSale);
+        validateSaleDate(existingSale, harvest);
+
+        existingSale.setQuantity(harvest.getTotalQte());
+        // Recalculate the revenue
+        existingSale.setRevenue(CalculRevenue(harvest,existingSale));
+        Sale updatedSale = saleRepository.save(existingSale);
+        return saleMapper.toDTO(updatedSale);
+    }
+
+    private void validateSaleDate(Sale sale, Harvest harvest) {
+        if (harvest.getDate().isAfter(sale.getSaleDate())) {
+            throw new IllegalArgumentException("Sale date should be after harvest date");
+        }
+    }
+
+    private double CalculRevenue(Harvest harvest, Sale sale) {
+        return harvest.getTotalQte() * sale.getUnitPrice();
+    }
+
     private void validateHarvestBeforeSale(Harvest harvest) {
         if (harvest.getSale() != null) {
             throw new IllegalStateException("This harvest has already been sold.");
