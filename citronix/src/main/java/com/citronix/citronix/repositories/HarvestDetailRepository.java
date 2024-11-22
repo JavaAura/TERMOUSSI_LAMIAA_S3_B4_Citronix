@@ -1,11 +1,13 @@
 package com.citronix.citronix.repositories;
 
+import com.citronix.citronix.entities.Harvest;
 import com.citronix.citronix.entities.HarvestDetail;
 import com.citronix.citronix.entities.enums.Seasons;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface HarvestDetailRepository extends JpaRepository<HarvestDetail,Long> {
@@ -16,6 +18,8 @@ public interface HarvestDetailRepository extends JpaRepository<HarvestDetail,Lon
             @Param("treeId") Long treeId,
             @Param("season") Seasons season,
             @Param("year") int year);
+
+    List<HarvestDetail> findByHarvest(Harvest harvest);
 
 
 }

@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import java.util.List;
 
 
 @Service
@@ -68,8 +69,21 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
         validateTreeNotAlreadyHarvested(harvestTreeId, harvestSeason, harvestYear);
 
         HarvestDetail savedHarvestDetail = harvestDetailRepository.save(harvestDetail);
-        log.info("Qte saved harvest" + savedHarvestDetail.getQuantity());
+        // Recalculate totalQte for the associated Harvest
+        CalculHarvestTotalQte(savedHarvestDetail.getHarvest());
+
         return harvestDetailMapper.toDTO(savedHarvestDetail);
+    }
+
+    private void CalculHarvestTotalQte(Harvest harvest) {
+        List<HarvestDetail> harvestDetails = harvestDetailRepository.findByHarvest(harvest);
+
+        double totalQuantity = 0;
+        for (HarvestDetail detail : harvestDetails) {
+            totalQuantity += detail.getQuantity();
+        }
+        harvest.setTotalQte(totalQuantity);
+        harvestRepository.save(harvest);
     }
 
     @Override
@@ -102,21 +116,24 @@ public class HarvestDetailServiceImpl implements HarvestDetailService {
         existingHarvestDetail.setQuantity(newProductivity);  // Update quantity if needed
 
         HarvestDetail updatedHarvestDetail = harvestDetailRepository.save(existingHarvestDetail);
+        CalculHarvestTotalQte(harvest);
         return harvestDetailMapper.toDTO(updatedHarvestDetail);
     }
 
     @Override
-    public Page<HarvestDetailDTO> getAllHarvestDetails(Pageable pageable){
+    public Page<HarvestDetailDTO> getAllHarvestDetails(Pageable pageable) {
         Page<HarvestDetail> harvestDetailsPage = harvestDetailRepository.findAll(pageable);
         return harvestDetailsPage.map(harvestDetailMapper::toDTO);
     }
+
     @Override
-    public void deleteHarvestDetail(Long id){
+    public void deleteHarvestDetail(Long id) {
         HarvestDetail harvestDetail = harvestDetailRepository.findById(id)
                 .orElseThrow(() -> new HarvestDetailNotFoundException(id));
+        Harvest harvest = harvestDetail.getHarvest();
         harvestDetailRepository.delete(harvestDetail);
+        CalculHarvestTotalQte(harvest);
     }
-
 
 
     private void validateTreeNotAlreadyHarvested(Long treeId, Seasons season, int year) {

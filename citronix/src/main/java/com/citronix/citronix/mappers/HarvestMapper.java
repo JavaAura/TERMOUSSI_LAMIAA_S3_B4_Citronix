@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel = "spring")
 @Component
 public interface HarvestMapper {
-
+    @Mapping(target = "totalQte", source = "totalQte")
     HarvestDTO toDTO(Harvest harvest);
-
+    @Mapping(target = "totalQte", source = "totalQte")
     Harvest toEntity(HarvestDTO harvestDTO);
 
     @Mapping(target="id",ignore = true)

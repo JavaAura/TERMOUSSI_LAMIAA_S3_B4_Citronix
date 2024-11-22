@@ -31,6 +31,7 @@ public class HarvestServiceImpl implements HarvestService {
     @Override
     public HarvestDTO saveHarvest(@Valid HarvestDTO harvestDTO){
         Harvest harvest=harvestMapper.toEntity(harvestDTO);
+//        harvest.calculateTotalQuantity();
       Harvest savedHarvest=  harvestRepository.save(harvest);
       return harvestMapper.toDTO(savedHarvest);
     }

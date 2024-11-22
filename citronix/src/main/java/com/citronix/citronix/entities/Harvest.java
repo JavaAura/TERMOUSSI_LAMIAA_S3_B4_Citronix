@@ -1,6 +1,7 @@
 package com.citronix.citronix.entities;
 
 import com.citronix.citronix.entities.enums.Seasons;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,8 +31,10 @@ public class Harvest {
     @NotNull
     private LocalDate date;
 
-    @OneToMany(mappedBy = "harvest")
+    @OneToMany(mappedBy = "harvest", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<HarvestDetail> harvestDetails = new HashSet<>();
 
-    //    private double totalQte;
+    @Column(nullable = false)
+    private double totalQte;
+
 }

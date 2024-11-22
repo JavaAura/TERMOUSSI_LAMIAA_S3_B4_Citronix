@@ -18,4 +18,5 @@ public class HarvestDTO {
     private Seasons season;
 
     private LocalDate date;
+    private double totalQte;
 }
